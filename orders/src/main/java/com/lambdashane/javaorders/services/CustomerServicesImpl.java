@@ -61,4 +61,12 @@ public class CustomerServicesImpl implements CustomerServices
     {
         return custrepos.findByCustnameContainingIgnoreCase(subname);
     }
+
+    @Override
+    public void delete(long custcode)
+    {
+        custrepos.findById(custcode)
+            .orElseThrow(() -> new EntityNotFoundException("Customer "+custcode+" not found"));
+        custrepos.deleteById(custcode);
+    }
 }

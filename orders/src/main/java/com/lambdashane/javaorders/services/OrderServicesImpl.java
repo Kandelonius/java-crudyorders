@@ -28,6 +28,14 @@ public class OrderServicesImpl implements OrderServices
         Order o = new Order();
 
         return ordersrepos.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Order "+id+" does not exist!"));
+            .orElseThrow(() -> new EntityNotFoundException("Order " + id + " does not exist!"));
+    }
+
+    @Override
+    public void delete(long ordnum)
+    {
+        ordersrepos.findById(ordnum)
+            .orElseThrow(() -> new EntityNotFoundException("Order "+ordnum+" not found"));
+        ordersrepos.deleteById(ordnum);
     }
 }

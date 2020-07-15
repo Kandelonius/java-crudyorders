@@ -15,4 +15,6 @@ public interface CustomerServices
     Customer findByCustnameIgnoringCase(String custname);
 
     List<Customer> findByNameLike(String custname);
+
+    void delete(long custcode);
 }

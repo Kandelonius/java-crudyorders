@@ -3,10 +3,14 @@ package com.lambdashane.javaorders.controllers;
 import com.lambdashane.javaorders.models.Customer;
 import com.lambdashane.javaorders.services.CustomerServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -55,9 +59,44 @@ public class CustomerController
 
     // POST
     // POST http://localhost:2019/customers/customer
+    @PostMapping(value = "/customer",
+        consumes = "application/json")
+    public ResponseEntity<?> addNewCustomer(
+        @Valid
+        @RequestBody
+            Customer newCustomer)
+    {
+        newCustomer.setCustcode(0);
+        newCustomer = customerServices.save(newCustomer);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        URI newCustomerUri = ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{custcode}")
+            .buildAndExpand(newCustomer.getCustcode())
+            .toUri();
+        responseHeaders.setLocation(newCustomerUri);
+        return new ResponseEntity<>(null,
+            responseHeaders,
+            HttpStatus.CREATED);
+    }
 
     // PUT
     // PUT http://localhost:2019/customers/customer/19
+    @PutMapping(value = "customer/{custcode}",
+        produces = "application/json",
+        consumes = "application/json")
+    public ResponseEntity<?> updateCustomer(
+        @Valid
+        @RequestBody
+            Customer updateCustomer,
+        @PathVariable
+            long custcode)
+    {
+        updateCustomer.setCustcode(custcode);
+        updateCustomer = customerServices.save(updateCustomer);
+
+        return new ResponseEntity<>(updateCustomer, HttpStatus.OK);
+    }
 
     // PATCH
     // PATCH http://localhost:2019/customers/customer/19

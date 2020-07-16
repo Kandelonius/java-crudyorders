@@ -17,4 +17,6 @@ public interface CustomerServices
     List<Customer> findByNameLike(String custname);
 
     void delete(long custcode);
+
+    Customer update(Customer customer, long custcode);
 }

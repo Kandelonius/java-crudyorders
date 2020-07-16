@@ -100,6 +100,15 @@ public class CustomerController
 
     // PATCH
     // PATCH http://localhost:2019/customers/customer/19
+    // Request Body - JSON Object
+    @PatchMapping(value = "/customer/{custcode}",
+    consumes = "application/json")
+    public ResponseEntity<?> updatePartCustomer(@RequestBody Customer updateCustomer,
+                                                    @PathVariable long custcode)
+    {
+        customerServices.update(updateCustomer, custcode);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     // DELETE
     // DELETE http://localhost:2019/customers/customer/54

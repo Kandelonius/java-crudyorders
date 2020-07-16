@@ -1,7 +1,9 @@
 package com.lambdashane.javaorders.services;
 
 import com.lambdashane.javaorders.models.Order;
+import com.lambdashane.javaorders.models.Payment;
 import com.lambdashane.javaorders.repositories.OrdersRepository;
+import com.lambdashane.javaorders.repositories.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +17,40 @@ public class OrderServicesImpl implements OrderServices
     @Autowired
     private OrdersRepository ordersrepos;
 
+    @Autowired
+    private PaymentRepository paymentrepos;
+
     @Transactional
     @Override
     public Order save(Order order)
     {
-        return ordersrepos.save(order);
+        Order newOrder = new Order();
+
+        if (order.getOrdnum() != 0)
+        {
+            ordersrepos.findById(order.getOrdnum())
+                .orElseThrow(() -> new EntityNotFoundException("Order " + order.getOrdnum() + " not found"));
+
+            newOrder.setOrdnum(order.getOrdnum());
+        }
+
+        newOrder.setOrdamount(order.getOrdamount());
+        newOrder.setAdvanceamount(order.getAdvanceamount());
+        newOrder.setCustomer(order.getCustomer());
+        newOrder.setOrderdescription(order.getOrderdescription());
+
+        // ManyToMany
+        newOrder.getPayments()
+            .clear();
+        for (Payment p : order.getPayments())
+        {
+            Payment newPay = paymentrepos.findById(p.getPaymentid())
+                .orElseThrow(() -> new EntityNotFoundException("Payment " + p.getPaymentid() + " not found"));
+
+            newOrder.getPayments()
+                .add(newPay);
+        }
+        return ordersrepos.save(newOrder);
     }
 
     @Override
@@ -35,7 +66,7 @@ public class OrderServicesImpl implements OrderServices
     public void delete(long ordnum)
     {
         ordersrepos.findById(ordnum)
-            .orElseThrow(() -> new EntityNotFoundException("Order "+ordnum+" not found"));
+            .orElseThrow(() -> new EntityNotFoundException("Order " + ordnum + " not found"));
         ordersrepos.deleteById(ordnum);
     }
 }
